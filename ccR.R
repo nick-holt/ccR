@@ -14,12 +14,13 @@
 #                                                                                                                                   #
 # Current Status: In development                                                                                                    #
 #                                                                                                                                   #
-# Last edited: 11-6-17                                                                                                              #
+# Last edited: 11-11-17                                                                                                             #
 #                                                                                                                                   #
 # Log:                                                                                                                              #
 #       # 10-13-17: Established ability to retreive full campaign list using 'next' API argument                                    #
 #       # 11-03-17: Built and tested functions to extract campaigns and all contacts for a given campaign                           #
 #       # 11-06-17: Built and tested functions to extract specific actions for a campaign and all actions for a campaign            #
+#       # 11-11-17: Built and tested a function to associate actions with campaign links via link_ids                               #
 #                                                                                                                                   #
 #####################################################################################################################################
 
@@ -191,4 +192,32 @@ extractCampaignActions <- function(campaign_id){
         actions <- bind_rows(dummy.actions, clicks.dataframe, opens.dataframe, forwards.dataframe, unsubscribes.dataframe, bounces.dataframe)
         return(actions)
 }
+
+#-----------------------------------------------------------
+# Function to associate links with link ids for a campaign
+#-----------------------------------------------------------
+
+extractLinkInfo <- function(campaign_id){
+        
+        # set links.dataframe to NULL
+        links.dataframe <- NULL
+        
+        # start url
+        start_url <- paste0("https://api.constantcontact.com/v2/emailmarketing/campaigns/", campaign_id, "?access_token=", access_token, "&api_key=", api_key)
+        
+        # Get first page of contacts
+        linksJSON <- getURL(start_url)
+        JSONList <- jsonlite::fromJSON(linksJSON)
+        linklist <- map(JSONList, "url")$click_through_details
+        linkids <- map(JSONList, "url_uid")$click_through_details
+        links.dataframe <- data.frame(cbind(linkids, linklist))
+        return(links.dataframe)
+}
+
+
+
+
+
+
+
 
