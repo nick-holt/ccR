@@ -1,2 +1,2 @@
 # ccR
-An R package to enable interaction with the Constant Contact API
+An R wrapper for the Constant Contact API
